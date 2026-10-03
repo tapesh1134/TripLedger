@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from app.config import load_endpoint
+from app.config import ConfigurationError, load_endpoint
 from integrations.model_client import ModelClient, ProviderError
 from mcp_server.schemas import ComputeRequest, Decision, ExpenseReport
 from mcp_server.tools_compute import compute_totals
@@ -92,6 +92,9 @@ def main() -> int:
         print(json.dumps({"ok": False, "validation_errors": problems}), file=sys.stderr)
         return 1
     except ProviderError as error:
+        print(json.dumps({"ok": False, "error": str(error)}), file=sys.stderr)
+        return 1
+    except ConfigurationError as error:
         print(json.dumps({"ok": False, "error": str(error)}), file=sys.stderr)
         return 1
     except (ValueError, OSError):

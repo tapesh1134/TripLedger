@@ -9,6 +9,10 @@ from urllib.parse import urlsplit
 from dotenv import load_dotenv
 
 
+class ConfigurationError(ValueError):
+    """Safe configuration diagnostic with no secret value."""
+
+
 @dataclass(frozen=True)
 class EndpointSettings:
     url: str
@@ -27,21 +31,28 @@ class EndpointSettings:
     vector_path: str = "data.0.embedding"
 
     def __post_init__(self) -> None:
+        for name, value in (
+            ("API_KEY", self.api_key),
+            ("AUTH_HEADER", self.auth_header),
+            ("AUTH_SCHEME", self.auth_scheme),
+        ):
+            if not value.isascii() or any(ord(c) < 32 or ord(c) == 127 for c in value):
+                raise ConfigurationError(f"{name} contains non-ASCII or control characters")
         parsed = urlsplit(self.url)
         if parsed.scheme not in {"https", "http"} or not parsed.hostname:
-            raise ValueError("configure a valid API URL")
+            raise ConfigurationError("configure a valid API URL")
         if parsed.username or parsed.password or parsed.fragment:
-            raise ValueError("API URL must not contain credentials or a fragment")
+            raise ConfigurationError("API URL must not contain credentials or a fragment")
         if parsed.scheme == "http" and parsed.hostname not in {"localhost", "127.0.0.1", "::1"}:
-            raise ValueError("remote API endpoints require HTTPS")
+            raise ConfigurationError("remote API endpoints require HTTPS")
         if not self.model or not self.api_key:
-            raise ValueError("API model and API key are required")
+            raise ConfigurationError("API model and API key are required")
         if not 0 <= self.retries <= 3 or not 0 < self.timeout <= 120:
-            raise ValueError("use retries 0..3 and timeout 0..120 seconds")
+            raise ConfigurationError("use retries 0..3 and timeout 0..120 seconds")
         if self.temperature is not None and not 0 <= self.temperature <= 0.2:
-            raise ValueError("temperature must be between 0 and 0.2, or blank")
+            raise ConfigurationError("temperature must be between 0 and 0.2, or blank")
         if self.dimensions is not None and self.dimensions < 1:
-            raise ValueError("embedding dimensions must be positive")
+            raise ConfigurationError("embedding dimensions must be positive")
         if self.extra_body.keys() & {
             "model",
             "messages",
@@ -52,7 +63,7 @@ class EndpointSettings:
             self.input_field,
             "dimensions",
         }:
-            raise ValueError("extra body must not override core request fields")
+            raise ConfigurationError("extra body must not override core request fields")
 
 
 def load_endpoint(kind: str) -> EndpointSettings:
@@ -62,10 +73,10 @@ def load_endpoint(kind: str) -> EndpointSettings:
     endpoint = os.getenv(f"{prefix}_ENDPOINT_URL", "").strip()
     base = os.getenv(f"{prefix}_BASE_URL", "").strip().rstrip("/")
     if not endpoint and not base:
-        raise ValueError(f"set {prefix}_BASE_URL or {prefix}_ENDPOINT_URL in .env")
+        raise ConfigurationError(f"set {prefix}_BASE_URL or {prefix}_ENDPOINT_URL in .env")
     extra = json.loads(os.getenv(f"{prefix}_EXTRA_BODY_JSON", "{}"))
     if not isinstance(extra, dict):
-        raise ValueError(f"{prefix}_EXTRA_BODY_JSON must be a JSON object")
+        raise ConfigurationError(f"{prefix}_EXTRA_BODY_JSON must be a JSON object")
     temp = os.getenv("LLM_TEMPERATURE", "0.2").strip() if kind == "llm" else ""
     dimensions = os.getenv("EMBEDDING_DIMENSIONS", "").strip() if kind != "llm" else ""
     return EndpointSettings(

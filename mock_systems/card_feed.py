@@ -1,1 +1,1 @@
-"""Reserved for a later day. No Day 1 runtime implementation."""
+"""Day 2 role implemented in mock_systems.service; start with python -m mock_systems.run."""

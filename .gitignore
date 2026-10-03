@@ -13,3 +13,5 @@ dist/
 traces/*.jsonl
 traces/*.json
 !traces/.gitkeep
+
+runtime/
