@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "LineItem": {
+      "additionalProperties": false,
+      "properties": {
+        "line_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Line Id",
+          "type": "string"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "category": {
+          "minLength": 1,
+          "title": "Category",
+          "type": "string"
+        },
+        "merchant": {
+          "minLength": 1,
+          "title": "Merchant",
+          "type": "string"
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "receipt_file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt File"
+        }
+      },
+      "required": [
+        "line_id",
+        "date",
+        "category",
+        "merchant",
+        "amount",
+        "currency",
+        "description"
+      ],
+      "title": "LineItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "report_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Report Id",
+      "type": "string"
+    },
+    "employee_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Employee Id",
+      "type": "string"
+    },
+    "trip_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Trip Id",
+      "type": "string"
+    },
+    "submitted_at": {
+      "format": "date-time",
+      "title": "Submitted At",
+      "type": "string"
+    },
+    "base_currency": {
+      "pattern": "^[A-Z]{3}$",
+      "title": "Base Currency",
+      "type": "string"
+    },
+    "line_items": {
+      "items": {
+        "$ref": "#/$defs/LineItem"
+      },
+      "minItems": 1,
+      "title": "Line Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "report_id",
+    "employee_id",
+    "trip_id",
+    "submitted_at",
+    "base_currency",
+    "line_items"
+  ],
+  "title": "ExpenseReport",
+  "type": "object"
+}

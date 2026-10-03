@@ -1,0 +1,29 @@
+{
+  "base_currency": "EUR",
+  "lines": [
+    {
+      "line_id": "L1",
+      "amount": "412.00",
+      "currency": "EUR"
+    },
+    {
+      "line_id": "L2",
+      "amount": "38.40",
+      "currency": "EUR"
+    },
+    {
+      "line_id": "L3",
+      "amount": "96.00",
+      "currency": "EUR"
+    }
+  ],
+  "caps": [
+    {
+      "line_id": "L1",
+      "rule_id": "R-03",
+      "kind": "cap_excess",
+      "limit": "120.00",
+      "quantity": 3
+    }
+  ]
+}

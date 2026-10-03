@@ -1,0 +1,360 @@
+{
+  "$defs": {
+    "DecisionMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Model",
+          "type": "string"
+        },
+        "policy_version": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "prompt_hash": {
+          "minLength": 1,
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "tokens_in": {
+          "minimum": 0,
+          "title": "Tokens In",
+          "type": "integer"
+        },
+        "tokens_out": {
+          "minimum": 0,
+          "title": "Tokens Out",
+          "type": "integer"
+        },
+        "steps": {
+          "minimum": 0,
+          "title": "Steps",
+          "type": "integer"
+        },
+        "latency_ms": {
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model",
+        "policy_version",
+        "prompt_hash",
+        "tokens_in",
+        "tokens_out",
+        "steps",
+        "latency_ms",
+        "created_at"
+      ],
+      "title": "DecisionMeta",
+      "type": "object"
+    },
+    "DuplicateCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "line_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Line Id",
+          "type": "string"
+        },
+        "matched_line_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Matched Line Id",
+          "type": "string"
+        },
+        "matched_report_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Matched Report Id",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "line_id",
+        "matched_line_id",
+        "matched_report_id",
+        "evidence"
+      ],
+      "title": "DuplicateCandidate",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "ref": {
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "ref"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "rule_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "blocking",
+            "query",
+            "advisory"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "line_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Line Id"
+        },
+        "observed": {
+          "title": "Observed",
+          "type": "string"
+        },
+        "permitted": {
+          "title": "Permitted",
+          "type": "string"
+        },
+        "excess": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Excess"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "rule_id",
+        "severity",
+        "line_id",
+        "observed",
+        "permitted",
+        "excess",
+        "evidence"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "Reconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "line_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Line Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "matched",
+            "missing_receipt",
+            "missing_transaction",
+            "amount_mismatch",
+            "outside_trip_dates",
+            "duplicate"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "transaction_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Transaction Id"
+        },
+        "delta": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta"
+        }
+      },
+      "required": [
+        "line_id",
+        "status",
+        "transaction_id",
+        "delta"
+      ],
+      "title": "Reconciliation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "report_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Report Id",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "auto_approve",
+        "manager_review",
+        "audit_hold"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "reimbursable_total": {
+      "$ref": "#/$defs/Money"
+    },
+    "disallowed_total": {
+      "$ref": "#/$defs/Money"
+    },
+    "reconciliation": {
+      "items": {
+        "$ref": "#/$defs/Reconciliation"
+      },
+      "title": "Reconciliation",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "duplicate_candidates": {
+      "items": {
+        "$ref": "#/$defs/DuplicateCandidate"
+      },
+      "title": "Duplicate Candidates",
+      "type": "array"
+    },
+    "draft_query_to_submitter": {
+      "title": "Draft Query To Submitter",
+      "type": "string"
+    },
+    "meta": {
+      "$ref": "#/$defs/DecisionMeta"
+    }
+  },
+  "required": [
+    "report_id",
+    "decision",
+    "confidence",
+    "reimbursable_total",
+    "disallowed_total",
+    "reconciliation",
+    "findings",
+    "duplicate_candidates",
+    "draft_query_to_submitter",
+    "meta"
+  ],
+  "title": "Decision",
+  "type": "object"
+}

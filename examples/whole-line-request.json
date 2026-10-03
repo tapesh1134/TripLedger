@@ -1,0 +1,17 @@
+{
+  "base_currency": "EUR",
+  "lines": [
+    {
+      "line_id": "L1",
+      "amount": "75.50",
+      "currency": "EUR"
+    }
+  ],
+  "caps": [
+    {
+      "line_id": "L1",
+      "rule_id": "R-07",
+      "kind": "whole_line"
+    }
+  ]
+}

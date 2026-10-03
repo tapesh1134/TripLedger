@@ -1,0 +1,75 @@
+{
+  "report_id": "EXP-2026-04417",
+  "decision": "manager_review",
+  "confidence": 0.79,
+  "reimbursable_total": {
+    "amount": "494.40",
+    "currency": "EUR"
+  },
+  "disallowed_total": {
+    "amount": "52.00",
+    "currency": "EUR"
+  },
+  "reconciliation": [
+    {
+      "line_id": "L1",
+      "status": "matched",
+      "transaction_id": "TXN-DEMO-1",
+      "delta": "0.00"
+    },
+    {
+      "line_id": "L2",
+      "status": "missing_receipt",
+      "transaction_id": "TXN-DEMO-2",
+      "delta": "0.00"
+    },
+    {
+      "line_id": "L3",
+      "status": "matched",
+      "transaction_id": "TXN-DEMO-3",
+      "delta": "0.00"
+    }
+  ],
+  "findings": [
+    {
+      "rule_id": "R-03",
+      "severity": "blocking",
+      "line_id": "L1",
+      "observed": "Hotel exceeds the illustrative allowance",
+      "permitted": "Illustrative hotel allowance: EUR 120 per night for 3 nights",
+      "excess": "52.00",
+      "evidence": [
+        {
+          "source": "compute_totals",
+          "ref": "demo-calculation-L1"
+        }
+      ]
+    },
+    {
+      "rule_id": "R-02",
+      "severity": "query",
+      "line_id": "L2",
+      "observed": "No receipt",
+      "permitted": "Receipt required for EUR 25.00 or more",
+      "excess": null,
+      "evidence": [
+        {
+          "source": "report",
+          "ref": "EXP-2026-04417/L2"
+        }
+      ]
+    }
+  ],
+  "duplicate_candidates": [],
+  "draft_query_to_submitter": "Please supply the itemised receipt for the taxi expense L2.",
+  "meta": {
+    "model": "illustrative-only-no-model-run",
+    "policy_version": "demo-not-production",
+    "prompt_hash": "not-a-live-run",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "steps": 0,
+    "latency_ms": 0,
+    "created_at": "2026-04-18T14:02:31Z"
+  }
+}
