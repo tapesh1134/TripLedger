@@ -160,3 +160,27 @@ Implementation: `app/day6.py`, `evals/run_eval.py`, `evals/scoring.py`,
 `evals/ground_truth.json`. All earlier single-report and receipt smoke commands
 remain available. Corporate mypy App Control restrictions remain an environment
 issue; use approved tooling rather than disabling the policy.
+
+## EVAL-21 recovery feedback update
+
+A live run exhausted 12 steps after an extra top-level policy_version field and
+repeated reconciliation-delta errors. The prompt now clarifies metadata placement
+and distinguishes the claim/card difference from disallowed money. The verifier
+returns the exact expected matching delta in correction feedback; it does not
+silently overwrite the model's proposal or raise the step budget.
+
+For an existing installation, copy `app/assembler.py` and `agent/prompts.py` from
+this updated archive into the corresponding project folders. Preserve your `.env`,
+virtual environment and existing evaluation results. No dependency change or mock
+restart is required.
+
+The prompt/code fingerprint changed. Preserve the original full-suite result and
+use a new directory for the targeted check, rather than resuming the old batch:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.day6 --run-dir runtime/evals/recovery-21 --cases EVAL-21
+```
+
+Expected: manager_review, R-07 blocking, EUR 0 reimbursable, EUR 20 disallowed,
+and reconciliation delta zero for the matching EUR 20 card charge. A passing
+single-case recovery does not change the original full-suite first-pass score.

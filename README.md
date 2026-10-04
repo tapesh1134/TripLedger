@@ -1,3 +1,10 @@
+# TripLedger — Day 7
+
+Start with **[DAY7.md](DAY7.md)** for the local browser review dashboard.
+All earlier CLI and evaluation commands remain available.
+
+---
+
 # TripLedger — Days 1–6
 
 Start with **[DAY6.md](DAY6.md)** to evaluate the 25 reports using your custom LLM.

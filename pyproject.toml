@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tripledger-day6"
-version = "0.6.0"
-description = "TripLedger Days 1-6: reproducible expense review evaluation"
+name = "tripledger-day7"
+version = "0.7.0"
+description = "TripLedger Days 1-7: local expense review dashboard"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.10,<3", "httpx[socks]>=0.27,<1", "python-dotenv>=1,<2", "mcp>=1.30,<2", "jsonschema>=4.20,<5", "Pillow>=11,<13"]
 
@@ -39,3 +39,6 @@ files = ["app", "integrations", "mcp_server", "agent", "evals/scoring.py", "eval
 [[tool.mypy.overrides]]
 module = "mcp_server.server"
 disable_error_code = ["untyped-decorator", "no-untyped-call"]
+
+[tool.setuptools.package-data]
+app = ["static/*.html", "static/*.css", "static/*.js"]

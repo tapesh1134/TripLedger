@@ -200,7 +200,14 @@ def validate_candidate(
             )
         elif item.delta is not None and item.delta != Decimal(pair["amount_delta"]):
             problems.append(
-                "Reconciliation delta disagrees with deterministic matching: " + item.line_id
+                "Reconciliation delta disagrees with deterministic matching: "
+                + item.line_id
+                + "; transaction_id="
+                + str(item.transaction_id)
+                + "; expected delta="
+                + str(pair["amount_delta"])
+                + ". Copy this matching delta. Policy disallowance belongs in totals/findings, "
+                "not reconciliation.delta."
             )
         elif item.status == "matched" and Decimal(pair["amount_delta"]) != 0:
             problems.append(

@@ -25,7 +25,13 @@ A missing receipt over the policy threshold is a query; a suspected duplicate or
 prohibited category requires escalation. Do not use audit_hold without a supported
 policy rule defining it; use manager_review for unresolved cases in this demo.
 Final response: ONE JSON object matching the provided decision schema, no prose.
-Omit meta: the host stamps model, policy version, counts and timings. Include one
+Omit meta and all top-level metadata fields such as policy_version, model and
+prompt_hash: the host stamps these inside meta. Do not add fields to FINAL_SCHEMA.
+Reconciliation.delta is the absolute claim-versus-card amount difference from
+match_transactions.amount_delta. It is NOT a reimbursement reduction or policy
+excess. A prohibited expense can match its card charge exactly: retain the zero
+matching delta even when compute_totals disallows the whole expense.
+Include one
 reconciliation entry per line. Use null delta if a delta is unknown. Every finding
 requires evidence source/ref IDs naming returned records or policy URIs. Explain
 only conclusions/evidence, not hidden reasoning. Draft a short neutral request for

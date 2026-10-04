@@ -135,3 +135,36 @@ def test_resume_skips_saved_cases_and_retry_preserves_history(tmp_path, monkeypa
     args.max_steps = 11
     with pytest.raises(ValueError, match="changed"):
         asyncio.run(run(args))
+
+
+def test_prohibited_expense_delta_feedback_gives_exact_correction():
+    from decimal import Decimal
+
+    from test_day5 import resources
+
+    from app.assembler import validate_candidate
+
+    decision, report, events = golden(21)
+    decision.reconciliation[0].delta = Decimal("20.00")
+    policy = dict(
+        minimum_auto_approval_confidence=".85", auto_approval_ceiling="2500", resources=resources()
+    )
+    candidate, errors = validate_candidate(
+        decision.model_dump(mode="json"),
+        report,
+        events,
+        decision.meta.model_dump(mode="json"),
+        policy,
+    )
+    assert candidate is None
+    assert any("expected delta=0.00" in e and "Policy disallowance" in e for e in errors)
+    decision.reconciliation[0].delta = Decimal("0.00")
+    candidate, errors = validate_candidate(
+        decision.model_dump(mode="json"),
+        report,
+        events,
+        decision.meta.model_dump(mode="json"),
+        policy,
+    )
+    assert not errors and candidate is not None
+    assert candidate.disallowed_total.amount == Decimal("20.00")
