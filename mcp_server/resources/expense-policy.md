@@ -1,5 +1,5 @@
 # TripLedger expense policy
-version: 2026-Q2-demo-1
+version: 2026-Q2-demo-2
 status: invented teaching policy; synthetic data only
 base_currency: EUR
 receipt_threshold: 25.00 (inclusive)

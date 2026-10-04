@@ -65,11 +65,26 @@ def match_transactions(
             matched_lines.add(line.line_id)
             matched_transactions.add(txn.txn_id)
     pairs.sort(key=lambda x: (-float(x["score"]), str(x["line_id"]), str(x["txn_id"])))
+    counts: dict[str, int] = {}
+    kept = []
+    for pair in pairs:
+        lid = pair["line_id"]
+        counts[lid] = counts.get(lid, 0) + 1
+        if counts[lid] <= 3:
+            kept.append(pair)
+    dropped = len(pairs) - len(kept)
+    pairs = kept
+    matched_lines = {x["line_id"] for x in pairs}
+    matched_transactions = {x["txn_id"] for x in pairs}
     return {
+        "candidates_omitted": dropped,
         "pairs": pairs,
         "unmatched_lines": [x.line_id for x in args.lines if x.line_id not in matched_lines],
         "unmatched_transactions": [
             x.txn_id for x in args.transactions if x.txn_id not in matched_transactions
         ],
-        "note": "Candidates only; shared line/transaction IDs require later adjudication.",
+        "note": (
+            "Top 3 candidates per line; shared IDs require adjudication. "
+            "Omitted candidates may exist."
+        ),
     }

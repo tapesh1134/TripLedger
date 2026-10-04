@@ -93,8 +93,8 @@ class DecisionMeta(Contract):
     model: Identifier
     policy_version: Identifier
     prompt_hash: Annotated[str, Field(min_length=1)]
-    tokens_in: Annotated[int, Field(ge=0)]
-    tokens_out: Annotated[int, Field(ge=0)]
+    tokens_in: Annotated[int, Field(ge=0)] | None
+    tokens_out: Annotated[int, Field(ge=0)] | None
     steps: Annotated[int, Field(ge=0)]
     latency_ms: Annotated[int, Field(ge=0)]
     created_at: AwareDatetime

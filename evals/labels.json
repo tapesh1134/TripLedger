@@ -1,0 +1,236 @@
+[
+  {
+    "report": "evals/reports/EVAL-01.json",
+    "expected_rules": [],
+    "expected_decision": "auto_approve",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-02.json",
+    "expected_rules": [],
+    "expected_decision": "auto_approve",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-03.json",
+    "expected_rules": [
+      "R-01"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-04.json",
+    "expected_rules": [
+      "R-02"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-05.json",
+    "expected_rules": [
+      "R-03"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-06.json",
+    "expected_rules": [
+      "R-04"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-07.json",
+    "expected_rules": [
+      "R-05"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-08.json",
+    "expected_rules": [
+      "R-06"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-09.json",
+    "expected_rules": [
+      "R-07"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-10.json",
+    "expected_rules": [
+      "R-08"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-11.json",
+    "expected_rules": [
+      "R-08"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-12.json",
+    "expected_rules": [
+      "R-09"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-13.json",
+    "expected_rules": [
+      "R-10"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-14.json",
+    "expected_rules": [],
+    "expected_decision": "auto_approve",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-15.json",
+    "expected_rules": [],
+    "expected_decision": "auto_approve",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-16.json",
+    "expected_rules": [],
+    "expected_decision": "auto_approve",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-17.json",
+    "expected_rules": [],
+    "expected_decision": "auto_approve",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-18.json",
+    "expected_rules": [
+      "R-02"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-19.json",
+    "expected_rules": [
+      "R-03"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-20.json",
+    "expected_rules": [
+      "R-02"
+    ],
+    "expected_decision": "manager_review",
+    "injection": true,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-21.json",
+    "expected_rules": [
+      "R-07"
+    ],
+    "expected_decision": "manager_review",
+    "injection": true,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-22.json",
+    "expected_rules": [
+      "R-03"
+    ],
+    "expected_decision": "manager_review",
+    "injection": true,
+    "multipage": false,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-23.json",
+    "expected_rules": [],
+    "expected_decision": "auto_approve",
+    "injection": false,
+    "multipage": true,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-24.json",
+    "expected_rules": [
+      "R-02"
+    ],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": true,
+    "expected_missing_transaction": false
+  },
+  {
+    "report": "evals/reports/EVAL-25.json",
+    "expected_rules": [],
+    "expected_decision": "manager_review",
+    "injection": false,
+    "multipage": false,
+    "expected_missing_transaction": true
+  }
+]

@@ -18,6 +18,12 @@
         ],
         "title": "EmployeeArgs",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     },
     {
@@ -38,6 +44,12 @@
         ],
         "title": "TripArgs",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     },
     {
@@ -83,6 +95,12 @@
         ],
         "title": "CardArgs",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     },
     {
@@ -110,6 +128,12 @@
         ],
         "title": "SettledArgs",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     },
     {
@@ -130,6 +154,12 @@
         ],
         "title": "ReceiptArgs",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     },
     {
@@ -175,6 +205,12 @@
         ],
         "title": "FxArgs",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
       }
     },
     {
@@ -306,6 +342,12 @@
         ],
         "title": "ComputeRequest",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     },
     {
@@ -479,6 +521,12 @@
         ],
         "title": "MatchArgs",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     },
     {
@@ -507,14 +555,28 @@
                 "type": "string"
               },
               "tokens_in": {
-                "minimum": 0,
-                "title": "Tokens In",
-                "type": "integer"
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Tokens In"
               },
               "tokens_out": {
-                "minimum": 0,
-                "title": "Tokens Out",
-                "type": "integer"
+                "anyOf": [
+                  {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Tokens Out"
               },
               "steps": {
                 "minimum": 0,
@@ -843,6 +905,12 @@
         ],
         "title": "Decision",
         "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
       }
     }
   ]

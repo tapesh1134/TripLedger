@@ -21,14 +21,28 @@
           "type": "string"
         },
         "tokens_in": {
-          "minimum": 0,
-          "title": "Tokens In",
-          "type": "integer"
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tokens In"
         },
         "tokens_out": {
-          "minimum": 0,
-          "title": "Tokens Out",
-          "type": "integer"
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tokens Out"
         },
         "steps": {
           "minimum": 0,

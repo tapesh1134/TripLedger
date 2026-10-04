@@ -1,11 +1,13 @@
-# TripLedger — Days 1, 2 and 3
+# TripLedger — Days 1–4
 
-Start with [DAY3.md](DAY3.md) to run the MCP server and Inspector.
+Start with **[DAY4.md](DAY4.md)** for the model-driven expense review agent.
+This ZIP includes the previous three days. Keep using your working custom API `.env`.
 
-Copy your working `.env` from Day 2; keep `EMBEDDING_DIMENSIONS=` blank.
+- [DAY1.md](DAY1.md): exact arithmetic and custom chat/embedding adapters.
+- [DAY2.md](DAY2.md): mock HR, travel, card and ledger services; FX and retries.
+- [DAY3.md](DAY3.md): nine MCP tools, policy resources and Inspector.
+- [DAY4.md](DAY4.md): bounded function-calling agent, trace files and 25 labelled fixtures.
+- [RESULTS-DAY4.md](RESULTS-DAY4.md): verified results and limits.
 
-- [DAY1.md](DAY1.md): calculator and custom API setup (historical milestone).
-- [DAY2.md](DAY2.md): four mock HTTP services, retries and historical FX.
-- [DAY3.md](DAY3.md): nine MCP tools, three resources, one prompt and matching.
-
-The autonomous agent begins on Day 4. Image receipt extraction begins on Day 5.
+Run from this extracted source directory. Receipt images, independent full-policy
+verification and evaluation scoring remain later work. Synthetic teaching data only.

@@ -1,5 +1,5 @@
 {
-  "version": "2026-Q2-demo-1",
+  "version": "2026-Q2-demo-2",
   "provenance": "Teaching-only category mapping, not a production MCC directory; 9999 is a synthetic prohibited code.",
   "codes": {
     "7011": {
@@ -25,6 +25,10 @@
     "9999": {
       "category": "adult_entertainment_demo",
       "prohibited": true
+    },
+    "4511": {
+      "category": "airline",
+      "prohibited": false
     }
   },
   "unknown_code_behavior": "Unknown category: requires review, do not assume permitted."

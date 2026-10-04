@@ -16,7 +16,7 @@ from mock_systems.service import MockServer
 def main() -> None:
     load_dotenv()
     parser = argparse.ArgumentParser(description="Run four synthetic HTTP services on localhost")
-    parser.add_argument("--seed", type=Path, default=DEFAULT_PATH)
+    parser.add_argument("--seed", type=Path, default=DEFAULT_PATH.with_name("day4-data.json"))
     parser.add_argument("--queue", type=Path, default=Path("runtime/review-queue.sqlite3"))
     args = parser.parse_args()
     data = json.loads(args.seed.read_text(encoding="utf-8"))

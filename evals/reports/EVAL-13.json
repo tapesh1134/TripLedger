@@ -1,0 +1,19 @@
+{
+  "report_id": "EVAL-13",
+  "employee_id": "EVAL-EMP-13",
+  "trip_id": "EVAL-TRP-13",
+  "submitted_at": "2026-04-18T12:00:00Z",
+  "base_currency": "EUR",
+  "line_items": [
+    {
+      "line_id": "L1",
+      "date": "2026-04-09",
+      "category": "flight",
+      "merchant": "Demo Airline",
+      "amount": "3000.00",
+      "currency": "EUR",
+      "description": "Synthetic business travel",
+      "receipt_file": "receipts/eval/EVAL-13-L1.json"
+    }
+  ]
+}

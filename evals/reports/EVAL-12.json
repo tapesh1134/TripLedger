@@ -1,0 +1,19 @@
+{
+  "report_id": "EVAL-12",
+  "employee_id": "EVAL-EMP-12",
+  "trip_id": "EVAL-TRP-12",
+  "submitted_at": "2026-07-20T12:00:00Z",
+  "base_currency": "EUR",
+  "line_items": [
+    {
+      "line_id": "L1",
+      "date": "2026-04-09",
+      "category": "taxi",
+      "merchant": "Cab company 12",
+      "amount": "20.00",
+      "currency": "EUR",
+      "description": "Synthetic business travel",
+      "receipt_file": null
+    }
+  ]
+}
