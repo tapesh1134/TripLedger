@@ -1,0 +1,55 @@
+{
+  "version": "2026-Q2-demo-1",
+  "currency": "EUR",
+  "provenance": "Illustrative city/grade values selected for the demo; no full allowance table was provided in the screenshots.",
+  "cities": {
+    "Milan": {
+      "Consultant": {
+        "hotel_nightly": "120.00",
+        "meals_daily_per_head": "35.00",
+        "client_dinner_per_head": "55.00"
+      },
+      "Director": {
+        "hotel_nightly": "180.00",
+        "meals_daily_per_head": "50.00",
+        "client_dinner_per_head": "75.00"
+      }
+    },
+    "Paris": {
+      "Consultant": {
+        "hotel_nightly": "160.00",
+        "meals_daily_per_head": "35.00",
+        "client_dinner_per_head": "55.00"
+      },
+      "Director": {
+        "hotel_nightly": "220.00",
+        "meals_daily_per_head": "50.00",
+        "client_dinner_per_head": "75.00"
+      }
+    },
+    "Berlin": {
+      "Consultant": {
+        "hotel_nightly": "130.00",
+        "meals_daily_per_head": "35.00",
+        "client_dinner_per_head": "55.00"
+      },
+      "Director": {
+        "hotel_nightly": "190.00",
+        "meals_daily_per_head": "50.00",
+        "client_dinner_per_head": "75.00"
+      }
+    },
+    "London": {
+      "Consultant": {
+        "hotel_nightly": "180.00",
+        "meals_daily_per_head": "35.00",
+        "client_dinner_per_head": "55.00"
+      },
+      "Director": {
+        "hotel_nightly": "240.00",
+        "meals_daily_per_head": "50.00",
+        "client_dinner_per_head": "75.00"
+      }
+    }
+  }
+}

@@ -1,0 +1,849 @@
+{
+  "tools": [
+    {
+      "name": "get_employee",
+      "description": "Fetch synthetic HR grade, manager and cost centre.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "employee_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Employee Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "employee_id"
+        ],
+        "title": "EmployeeArgs",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_trip",
+      "description": "Fetch booked city, dates, flights and hotel nights.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "trip_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Trip Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "trip_id"
+        ],
+        "title": "TripArgs",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_card_transactions",
+      "description": "Fetch one page (20 rows). Follow next_cursor until null.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "employee_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Employee Id",
+            "type": "string"
+          },
+          "from": {
+            "format": "date",
+            "title": "From",
+            "type": "string"
+          },
+          "to": {
+            "format": "date",
+            "title": "To",
+            "type": "string"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "pattern": "^\\d+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cursor"
+          }
+        },
+        "required": [
+          "employee_id",
+          "from",
+          "to"
+        ],
+        "title": "CardArgs",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_settled_lines",
+      "description": "Fetch prior settled claims for duplicate checking, up to 12 months.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "employee_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Employee Id",
+            "type": "string"
+          },
+          "months": {
+            "default": 12,
+            "maximum": 12,
+            "minimum": 1,
+            "title": "Months",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "employee_id"
+        ],
+        "title": "SettledArgs",
+        "type": "object"
+      }
+    },
+    {
+      "name": "read_receipt",
+      "description": "Read a synthetic receipt JSON fixture under receipts/. Image extraction is Day 5.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "file_path": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "File Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_path"
+        ],
+        "title": "ReceiptArgs",
+        "type": "object"
+      }
+    },
+    {
+      "name": "fx_convert",
+      "description": "Convert with a dated historical rate; returns source and rate_date. Never invent a rate.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                "type": "string"
+              }
+            ],
+            "title": "Amount"
+          },
+          "from_ccy": {
+            "pattern": "^[A-Z]{3}$",
+            "title": "From Ccy",
+            "type": "string"
+          },
+          "to_ccy": {
+            "pattern": "^[A-Z]{3}$",
+            "title": "To Ccy",
+            "type": "string"
+          },
+          "on_date": {
+            "format": "date",
+            "title": "On Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "from_ccy",
+          "to_ccy",
+          "on_date"
+        ],
+        "title": "FxArgs",
+        "type": "object"
+      }
+    },
+    {
+      "name": "compute_totals",
+      "description": "Exact decimal totals, supplied caps, excess versus whole-line disallowance.",
+      "inputSchema": {
+        "$defs": {
+          "Cap": {
+            "additionalProperties": false,
+            "description": "Caller supplies policy values. A limit is per unit; quantity is explicit.",
+            "properties": {
+              "line_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Line Id",
+                "type": "string"
+              },
+              "rule_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Rule Id",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "cap_excess",
+                  "whole_line"
+                ],
+                "title": "Kind",
+                "type": "string"
+              },
+              "limit": {
+                "anyOf": [
+                  {
+                    "minimum": 0.0,
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Limit"
+              },
+              "quantity": {
+                "default": 1,
+                "maximum": 10000,
+                "minimum": 1,
+                "title": "Quantity",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "line_id",
+              "rule_id",
+              "kind"
+            ],
+            "title": "Cap",
+            "type": "object"
+          },
+          "ComputeLine": {
+            "additionalProperties": false,
+            "properties": {
+              "line_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Line Id",
+                "type": "string"
+              },
+              "amount": {
+                "anyOf": [
+                  {
+                    "minimum": 0.0,
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                    "type": "string"
+                  }
+                ],
+                "title": "Amount"
+              },
+              "currency": {
+                "pattern": "^[A-Z]{3}$",
+                "title": "Currency",
+                "type": "string"
+              }
+            },
+            "required": [
+              "line_id",
+              "amount",
+              "currency"
+            ],
+            "title": "ComputeLine",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/$defs/ComputeLine"
+            },
+            "minItems": 1,
+            "title": "Lines",
+            "type": "array"
+          },
+          "caps": {
+            "items": {
+              "$ref": "#/$defs/Cap"
+            },
+            "title": "Caps",
+            "type": "array"
+          },
+          "base_currency": {
+            "pattern": "^[A-Z]{3}$",
+            "title": "Base Currency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lines",
+          "caps",
+          "base_currency"
+        ],
+        "title": "ComputeRequest",
+        "type": "object"
+      }
+    },
+    {
+      "name": "match_transactions",
+      "description": "Score candidate pairs using merchant, date and amount. Does not decide matches.",
+      "inputSchema": {
+        "$defs": {
+          "MatchLine": {
+            "additionalProperties": false,
+            "properties": {
+              "line_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Line Id",
+                "type": "string"
+              },
+              "date": {
+                "format": "date",
+                "title": "Date",
+                "type": "string"
+              },
+              "merchant": {
+                "minLength": 1,
+                "title": "Merchant",
+                "type": "string"
+              },
+              "amount": {
+                "anyOf": [
+                  {
+                    "minimum": 0.0,
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                    "type": "string"
+                  }
+                ],
+                "title": "Amount"
+              },
+              "currency": {
+                "pattern": "^[A-Z]{3}$",
+                "title": "Currency",
+                "type": "string"
+              },
+              "category": {
+                "default": "other",
+                "title": "Category",
+                "type": "string"
+              }
+            },
+            "required": [
+              "line_id",
+              "date",
+              "merchant",
+              "amount",
+              "currency"
+            ],
+            "title": "MatchLine",
+            "type": "object"
+          },
+          "MatchTransaction": {
+            "additionalProperties": false,
+            "properties": {
+              "txn_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Txn Id",
+                "type": "string"
+              },
+              "posted_date": {
+                "format": "date",
+                "title": "Posted Date",
+                "type": "string"
+              },
+              "merchant_raw": {
+                "minLength": 1,
+                "title": "Merchant Raw",
+                "type": "string"
+              },
+              "amount": {
+                "anyOf": [
+                  {
+                    "minimum": 0.0,
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                    "type": "string"
+                  }
+                ],
+                "title": "Amount"
+              },
+              "currency": {
+                "pattern": "^[A-Z]{3}$",
+                "title": "Currency",
+                "type": "string"
+              },
+              "employee_id": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Employee Id"
+              },
+              "mcc": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mcc"
+              },
+              "card_last4": {
+                "anyOf": [
+                  {
+                    "pattern": "^\\d{4}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Card Last4"
+              }
+            },
+            "required": [
+              "txn_id",
+              "posted_date",
+              "merchant_raw",
+              "amount",
+              "currency"
+            ],
+            "title": "MatchTransaction",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/$defs/MatchLine"
+            },
+            "maxItems": 100,
+            "title": "Lines",
+            "type": "array"
+          },
+          "transactions": {
+            "items": {
+              "$ref": "#/$defs/MatchTransaction"
+            },
+            "maxItems": 1000,
+            "title": "Transactions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "lines",
+          "transactions"
+        ],
+        "title": "MatchArgs",
+        "type": "object"
+      }
+    },
+    {
+      "name": "save_decision",
+      "description": "Store a schema-valid decision in the mock review queue only. Never pays money.",
+      "inputSchema": {
+        "$defs": {
+          "DecisionMeta": {
+            "additionalProperties": false,
+            "properties": {
+              "model": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Model",
+                "type": "string"
+              },
+              "policy_version": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Policy Version",
+                "type": "string"
+              },
+              "prompt_hash": {
+                "minLength": 1,
+                "title": "Prompt Hash",
+                "type": "string"
+              },
+              "tokens_in": {
+                "minimum": 0,
+                "title": "Tokens In",
+                "type": "integer"
+              },
+              "tokens_out": {
+                "minimum": 0,
+                "title": "Tokens Out",
+                "type": "integer"
+              },
+              "steps": {
+                "minimum": 0,
+                "title": "Steps",
+                "type": "integer"
+              },
+              "latency_ms": {
+                "minimum": 0,
+                "title": "Latency Ms",
+                "type": "integer"
+              },
+              "created_at": {
+                "format": "date-time",
+                "title": "Created At",
+                "type": "string"
+              }
+            },
+            "required": [
+              "model",
+              "policy_version",
+              "prompt_hash",
+              "tokens_in",
+              "tokens_out",
+              "steps",
+              "latency_ms",
+              "created_at"
+            ],
+            "title": "DecisionMeta",
+            "type": "object"
+          },
+          "DuplicateCandidate": {
+            "additionalProperties": false,
+            "properties": {
+              "line_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Line Id",
+                "type": "string"
+              },
+              "matched_line_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Matched Line Id",
+                "type": "string"
+              },
+              "matched_report_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Matched Report Id",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/Evidence"
+                },
+                "minItems": 1,
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "line_id",
+              "matched_line_id",
+              "matched_report_id",
+              "evidence"
+            ],
+            "title": "DuplicateCandidate",
+            "type": "object"
+          },
+          "Evidence": {
+            "additionalProperties": false,
+            "properties": {
+              "source": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Source",
+                "type": "string"
+              },
+              "ref": {
+                "minLength": 1,
+                "title": "Ref",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source",
+              "ref"
+            ],
+            "title": "Evidence",
+            "type": "object"
+          },
+          "Finding": {
+            "additionalProperties": false,
+            "properties": {
+              "rule_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Rule Id",
+                "type": "string"
+              },
+              "severity": {
+                "enum": [
+                  "blocking",
+                  "query",
+                  "advisory"
+                ],
+                "title": "Severity",
+                "type": "string"
+              },
+              "line_id": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Line Id"
+              },
+              "observed": {
+                "title": "Observed",
+                "type": "string"
+              },
+              "permitted": {
+                "title": "Permitted",
+                "type": "string"
+              },
+              "excess": {
+                "anyOf": [
+                  {
+                    "minimum": 0.0,
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Excess"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/Evidence"
+                },
+                "minItems": 1,
+                "title": "Evidence",
+                "type": "array"
+              }
+            },
+            "required": [
+              "rule_id",
+              "severity",
+              "line_id",
+              "observed",
+              "permitted",
+              "excess",
+              "evidence"
+            ],
+            "title": "Finding",
+            "type": "object"
+          },
+          "Money": {
+            "additionalProperties": false,
+            "properties": {
+              "amount": {
+                "anyOf": [
+                  {
+                    "minimum": 0.0,
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                    "type": "string"
+                  }
+                ],
+                "title": "Amount"
+              },
+              "currency": {
+                "pattern": "^[A-Z]{3}$",
+                "title": "Currency",
+                "type": "string"
+              }
+            },
+            "required": [
+              "amount",
+              "currency"
+            ],
+            "title": "Money",
+            "type": "object"
+          },
+          "Reconciliation": {
+            "additionalProperties": false,
+            "properties": {
+              "line_id": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Line Id",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "matched",
+                  "missing_receipt",
+                  "missing_transaction",
+                  "amount_mismatch",
+                  "outside_trip_dates",
+                  "duplicate"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "transaction_id": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Transaction Id"
+              },
+              "delta": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,12}|(?=[\\d.]{1,19}0*$)\\d{0,12}\\.\\d{0,6}0*$)",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Delta"
+              }
+            },
+            "required": [
+              "line_id",
+              "status",
+              "transaction_id",
+              "delta"
+            ],
+            "title": "Reconciliation",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "report_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Report Id",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "auto_approve",
+              "manager_review",
+              "audit_hold"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "confidence": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "reimbursable_total": {
+            "$ref": "#/$defs/Money"
+          },
+          "disallowed_total": {
+            "$ref": "#/$defs/Money"
+          },
+          "reconciliation": {
+            "items": {
+              "$ref": "#/$defs/Reconciliation"
+            },
+            "title": "Reconciliation",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/$defs/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "duplicate_candidates": {
+            "items": {
+              "$ref": "#/$defs/DuplicateCandidate"
+            },
+            "title": "Duplicate Candidates",
+            "type": "array"
+          },
+          "draft_query_to_submitter": {
+            "title": "Draft Query To Submitter",
+            "type": "string"
+          },
+          "meta": {
+            "$ref": "#/$defs/DecisionMeta"
+          }
+        },
+        "required": [
+          "report_id",
+          "decision",
+          "confidence",
+          "reimbursable_total",
+          "disallowed_total",
+          "reconciliation",
+          "findings",
+          "duplicate_candidates",
+          "draft_query_to_submitter",
+          "meta"
+        ],
+        "title": "Decision",
+        "type": "object"
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "lines": [
+    {
+      "line_id": "L2",
+      "date": "2026-04-09",
+      "merchant": "UBER *TRIP HELP.UBER.CO",
+      "amount": "38.40",
+      "currency": "EUR",
+      "category": "taxi"
+    }
+  ],
+  "transactions": [
+    {
+      "txn_id": "TXN-00-022",
+      "posted_date": "2026-04-09",
+      "merchant_raw": "UBER BV AMSTERDAM",
+      "amount": "38.40",
+      "currency": "EUR"
+    }
+  ]
+}

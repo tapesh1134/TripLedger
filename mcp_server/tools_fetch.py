@@ -1,1 +1,4 @@
-"""Reserved for a later day. No Day 1 runtime implementation."""
+"""Fetch dispatch lives in mcp_server.dispatch; HTTP adapters live in backend.
+
+These are exposed by server.py via explicit validated MCP contracts.
+"""
