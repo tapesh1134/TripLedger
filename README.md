@@ -1,12 +1,11 @@
-# TripLedger — Days 1–5
+# TripLedger — Days 1–6
 
-Start with **[DAY5.md](DAY5.md)** for Windows setup, custom-API receipt extraction,
-and the independent evidence/policy verifier. Copy your working Day 4 `.env` and
-keep the 120-second HTTP timeout. Image extraction is explicitly enabled separately.
+Start with **[DAY6.md](DAY6.md)** to evaluate the 25 reports using your custom LLM.
+It explains the three-case smoke run, full suite, resume/retry commands and scores.
+Copy your working Day 5 `.env`; the working agent and verifier are preserved.
 
-This package includes all previous days, 25 labelled synthetic reports, a PNG
-receipt fixture and automated tests. See [RESULTS-DAY5.md](RESULTS-DAY5.md) for
-verification results and the distinction between mocked API tests and live runs.
+See [RESULTS-DAY6.md](RESULTS-DAY6.md) for automated verification. Live benchmark
+results are generated only when you run the evaluation with your API credentials.
 
-Historical milestones: [Day 1](DAY1.md), [Day 2](DAY2.md), [Day 3](DAY3.md),
-[Day 4](DAY4.md). Batch scoring and benchmarks remain Day 6.
+Earlier milestones: [Day 1](DAY1.md), [Day 2](DAY2.md), [Day 3](DAY3.md),
+[Day 4](DAY4.md), [Day 5](DAY5.md).

@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tripledger-day5"
-version = "0.5.0"
-description = "TripLedger Days 1-5: receipt extraction and evidence validation"
+name = "tripledger-day6"
+version = "0.6.0"
+description = "TripLedger Days 1-6: reproducible expense review evaluation"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.10,<3", "httpx[socks]>=0.27,<1", "python-dotenv>=1,<2", "mcp>=1.30,<2", "jsonschema>=4.20,<5", "Pillow>=11,<13"]
 
@@ -16,7 +16,7 @@ dev = ["pytest>=8,<9", "ruff>=0.9,<1", "mypy>=1.14,<2", "types-jsonschema"]
 tripledger = "app.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["app*", "integrations*", "mcp_server*", "agent*", "mock_systems*"]
+include = ["app*", "integrations*", "mcp_server*", "agent*", "mock_systems*", "evals*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -32,7 +32,7 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["app", "integrations", "mcp_server", "agent"]
+files = ["app", "integrations", "mcp_server", "agent", "evals/scoring.py", "evals/run_eval.py"]
 
 # MCP v1 low-level registration decorators lack complete typing annotations.
 # Restrict this exception to decorator boundaries, not the tool implementation.
