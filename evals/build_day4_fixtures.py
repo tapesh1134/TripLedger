@@ -27,7 +27,7 @@ def build():
         19: ["R-03"],
         20: ["R-02"],
         21: ["R-07"],
-        22: ["R-03"],
+        22: ["R-03", "R-02"],
         24: ["R-02"],
     }
     for n in range(1, 26):
@@ -134,6 +134,13 @@ def build():
                     currency="EUR",
                 )
             )
+        for line in lines:
+            if line["category"] == "meals":
+                line.update(
+                    attendee_count=3 if n == 16 else 1,
+                    is_client_dinner=n == 16,
+                    alcohol_amount="10.00" if n == 8 else "0.00",
+                )
         report = dict(
             report_id=rid,
             employee_id=eid,

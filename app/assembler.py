@@ -1,4 +1,4 @@
-"""Day 4 minimal acceptance checks. Full rule-by-rule verification is Day 5."""
+"""Schema, provenance, receipt and independent teaching-policy verification."""
 
 from datetime import date, timedelta
 from decimal import Decimal
@@ -6,6 +6,9 @@ from typing import Any
 
 from pydantic import ValidationError
 
+from app.evidence import validate_evidence
+from app.policy_guard import verify_policy
+from mcp_server.matching import match_transactions
 from mcp_server.schemas import Decision, ExpenseReport
 
 
@@ -104,9 +107,9 @@ def validate_candidate(
     for line in report.line_items:
         if line.receipt_file and not any(
             e["name"] == "read_receipt" and e["args"].get("file_path") == line.receipt_file
-            for e in successful
+            for e in events
         ):
-            problems.append("Receipt unavailable: " + line.line_id)
+            problems.append("Attached receipt has not been attempted: " + line.line_id)
     computations = [e for e in successful if e["name"] == "compute_totals"]
     if computations:
         last = computations[-1]
@@ -150,4 +153,59 @@ def validate_candidate(
             or any(x.status != "matched" for x in decision.reconciliation)
         ):
             problems.append("Auto-approval gate failed; use manager_review.")
+    problems.extend(validate_evidence(decision, report, events))
+    # Recompute candidate matches from original report lines and fetched cards.
+    original_lines = [
+        {
+            "line_id": x.line_id,
+            "date": x.date.isoformat(),
+            "merchant": x.merchant,
+            "amount": str(x.amount),
+            "currency": x.currency,
+            "category": x.category,
+        }
+        for x in report.line_items
+    ]
+    actual_pairs = match_transactions(original_lines, list(transactions.values()))["pairs"]
+    by_pair = {(p["line_id"], p["txn_id"]): p for p in actual_pairs}
+    for item in decision.reconciliation:
+        if item.status == "missing_transaction" and item.transaction_id is not None:
+            problems.append(
+                "missing_transaction must not contain a transaction ID: " + item.line_id
+            )
+        if item.transaction_id is None:
+            exact = [p for p in actual_pairs if p["line_id"] == item.line_id and p["score"] == 1.0]
+            if len(exact) == 1:
+                txn_id = exact[0]["txn_id"]
+                contested = any(
+                    p["txn_id"] == txn_id and p["line_id"] != item.line_id and p["score"] == 1.0
+                    for p in actual_pairs
+                )
+                assigned = any(x.transaction_id == txn_id for x in decision.reconciliation)
+                if not contested and not assigned:
+                    problems.append(
+                        "Unused unique exact card match for "
+                        + item.line_id
+                        + ": "
+                        + txn_id
+                        + ". Link it with the tool delta; a missing receipt does not mean a "
+                        "missing transaction. Use missing_receipt when appropriate and remove "
+                        "the unsupported missing-transaction DATA-QUALITY finding."
+                    )
+            continue
+        pair = by_pair.get((item.line_id, item.transaction_id))
+        if pair is None:
+            problems.append(
+                "Selected transaction is not supported by original inputs: " + item.line_id
+            )
+        elif item.delta is not None and item.delta != Decimal(pair["amount_delta"]):
+            problems.append(
+                "Reconciliation delta disagrees with deterministic matching: " + item.line_id
+            )
+        elif item.status == "matched" and Decimal(pair["amount_delta"]) != 0:
+            problems.append(
+                "Nonzero transaction delta needs amount_mismatch and review: " + item.line_id
+            )
+    if policy.get("resources"):
+        problems.extend(verify_policy(decision, report, events, policy["resources"]))
     return (None if problems else decision), problems

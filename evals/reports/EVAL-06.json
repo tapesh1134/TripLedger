@@ -13,7 +13,10 @@
       "amount": "80.00",
       "currency": "EUR",
       "description": "Dinner alone; no alcohol",
-      "receipt_file": "receipts/eval/EVAL-06-L1.json"
+      "receipt_file": "receipts/eval/EVAL-06-L1.json",
+      "attendee_count": 1,
+      "is_client_dinner": false,
+      "alcohol_amount": "0.00"
     }
   ]
 }

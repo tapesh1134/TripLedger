@@ -41,7 +41,7 @@ CONTRACTS: dict[str, tuple[type[BaseModel], str]] = {
     ),
     "read_receipt": (
         ReceiptArgs,
-        "Read a synthetic receipt JSON fixture under receipts/. Image extraction is Day 5.",
+        "Read JSON or PNG/JPEG receipt under receipts/. Images use opt-in custom API vision.",
     ),
     "fx_convert": (
         FxArgs,
@@ -81,17 +81,30 @@ def read_receipt(file_path: str) -> dict[str, Any]:
     path = (root / candidate).resolve()
     if not path.is_relative_to(root):
         raise BackendError("RECEIPT_PATH_NOT_ALLOWED")
+    if path.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+        from integrations.receipt_vision import extract_receipt
+
+        result = extract_receipt(path)
+        if result["ok"]:
+            return {**result["data"], "ref": candidate.as_posix()}
+        return result
     if path.suffix.lower() != ".json":
         return error(
-            "IMAGE_EXTRACTION_DEFERRED",
-            "Day 3 supports JSON receipt fixtures only.",
-            "Treat the receipt as unverified. Vision extraction is scheduled for Day 5.",
+            "UNSUPPORTED_RECEIPT_FORMAT",
+            "Use JSON, PNG or JPEG.",
+            "PDF and other formats are not supported.",
         )
     if not path.is_file():
         raise BackendError("RECEIPT_NOT_FOUND")
     if path.stat().st_size > 100_000:
         raise BackendError("RECEIPT_TOO_LARGE")
     receipt = Receipt.model_validate_json(path.read_bytes())
+    if receipt.tax > receipt.total:
+        return error(
+            "RECEIPT_EXTRACTION_INVALID",
+            "Receipt tax exceeds total.",
+            "Review the receipt manually.",
+        )
     return {
         **receipt.model_dump(mode="json"),
         "source": "synthetic-json-fixture",

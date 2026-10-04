@@ -91,10 +91,7 @@ def test_receipt_fixture_and_path_confinement():
         execute("read_receipt", {"file_path": "../.env"})["error"]["code"]
         == "RECEIPT_PATH_NOT_ALLOWED"
     )
-    assert (
-        execute("read_receipt", {"file_path": "L1.jpg"})["error"]["code"]
-        == "IMAGE_EXTRACTION_DEFERRED"
-    )
+    assert execute("read_receipt", {"file_path": "L1.jpg"})["error"]["code"] == "VISION_DISABLED"
     assert execute("unknown", {})["error"]["code"] == "UNKNOWN_TOOL"
 
 

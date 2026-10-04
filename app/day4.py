@@ -17,7 +17,9 @@ from integrations.model_client import ModelClient
 
 
 async def run() -> int:
-    parser = argparse.ArgumentParser(description="Day 4 model-driven MCP review")
+    parser = argparse.ArgumentParser(
+        description="Day 5 model-driven MCP review and evidence verification"
+    )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--report", type=Path)
     group.add_argument("--batch", type=Path)

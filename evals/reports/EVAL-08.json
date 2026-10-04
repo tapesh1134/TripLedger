@@ -13,7 +13,10 @@
       "amount": "20.00",
       "currency": "EUR",
       "description": "Dinner alone; alcohol EUR 10 of EUR 20 total",
-      "receipt_file": null
+      "receipt_file": null,
+      "attendee_count": 1,
+      "is_client_dinner": false,
+      "alcohol_amount": "10.00"
     }
   ]
 }

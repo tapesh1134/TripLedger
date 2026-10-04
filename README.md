@@ -1,13 +1,12 @@
-# TripLedger — Days 1–4
+# TripLedger — Days 1–5
 
-Start with **[DAY4.md](DAY4.md)** for the model-driven expense review agent.
-This ZIP includes the previous three days. Keep using your working custom API `.env`.
+Start with **[DAY5.md](DAY5.md)** for Windows setup, custom-API receipt extraction,
+and the independent evidence/policy verifier. Copy your working Day 4 `.env` and
+keep the 120-second HTTP timeout. Image extraction is explicitly enabled separately.
 
-- [DAY1.md](DAY1.md): exact arithmetic and custom chat/embedding adapters.
-- [DAY2.md](DAY2.md): mock HR, travel, card and ledger services; FX and retries.
-- [DAY3.md](DAY3.md): nine MCP tools, policy resources and Inspector.
-- [DAY4.md](DAY4.md): bounded function-calling agent, trace files and 25 labelled fixtures.
-- [RESULTS-DAY4.md](RESULTS-DAY4.md): verified results and limits.
+This package includes all previous days, 25 labelled synthetic reports, a PNG
+receipt fixture and automated tests. See [RESULTS-DAY5.md](RESULTS-DAY5.md) for
+verification results and the distinction between mocked API tests and live runs.
 
-Run from this extracted source directory. Receipt images, independent full-policy
-verification and evaluation scoring remain later work. Synthetic teaching data only.
+Historical milestones: [Day 1](DAY1.md), [Day 2](DAY2.md), [Day 3](DAY3.md),
+[Day 4](DAY4.md). Batch scoring and benchmarks remain Day 6.

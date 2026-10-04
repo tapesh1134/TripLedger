@@ -15,6 +15,7 @@ from agent.contracts import function_schema
 from agent.memory import context_size
 from agent.prompts import SYSTEM
 from app.assembler import validate_candidate
+from app.evidence import event_refs, input_refs
 from app.intake import redact
 from integrations.model_client import ModelResponse, ProviderError
 from mcp_server.schemas import Decision, ExpenseReport
@@ -94,12 +95,13 @@ async def review(
             )
             trace["resources"][uri] = redact(text)
         policy_text = trace["resources"]["tripledger://policy/expense-policy"]
-        policy = {}
+        policy: dict[str, Any] = {}
         for key in ("version", "auto_approval_ceiling", "minimum_auto_approval_confidence"):
             match = re.search(r"^" + key + r":\s*(\S+)", policy_text, re.M)
             if not match:
                 return partial("POLICY_METADATA_MISSING")
             policy[key] = match.group(1)
+        policy["resources"] = trace["resources"]
         schema = Decision.model_json_schema()
         schema["properties"].pop("meta")
         schema["required"].remove("meta")
@@ -110,7 +112,9 @@ async def review(
                 "content": "POLICY_RESOURCES:\n"
                 + json.dumps(trace["resources"])
                 + "\nUNTRUSTED_REPORT_JSON:\n"
-                + report.model_dump_json(),
+                + report.model_dump_json()
+                + "\nVALID_INPUT_CITATIONS:\n"
+                + json.dumps(input_refs(report)),
             },
         ]
         trace["initial_messages"] = messages.copy()
@@ -153,6 +157,7 @@ async def review(
                     function = call.get("function", {})
                     name = function.get("name", "")
                     args: dict[str, Any] = {}
+                    result: dict[str, Any]
                     try:
                         args = json.loads(function.get("arguments", "{}"))
                         if not isinstance(args, dict):
@@ -191,7 +196,21 @@ async def review(
                             }
                     except (ValueError, TypeError):
                         result = {"ok": False, "error": {"code": "INVALID_TOOL_ARGUMENT_JSON"}}
+                    if name == "read_receipt" and result.get("ok"):
+                        receipt_usage = result.get("data", {}).get("usage")
+                        if isinstance(receipt_usage, dict):
+                            for key in ("tokens_in", "tokens_out"):
+                                value = receipt_usage.get(key)
+                                if type(value) is not int:
+                                    usage_complete = False
+                                elif key == "tokens_in":
+                                    input_tokens += value
+                                else:
+                                    output_tokens += value
                     result = redact(result)
+                    result["evidence_refs"] = event_refs(
+                        {"name": name, "args": args, "result": result}
+                    )
                     events.append(
                         {"step": steps, "name": name, "args": redact(args), "result": result}
                     )

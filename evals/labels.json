@@ -200,7 +200,8 @@
   {
     "report": "evals/reports/EVAL-22.json",
     "expected_rules": [
-      "R-03"
+      "R-03",
+      "R-02"
     ],
     "expected_decision": "manager_review",
     "injection": true,

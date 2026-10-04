@@ -1,5 +1,5 @@
 # TripLedger expense policy
-version: 2026-Q2-demo-2
+version: 2026-Q2-demo-3
 status: invented teaching policy; synthetic data only
 base_currency: EUR
 receipt_threshold: 25.00 (inclusive)
@@ -30,3 +30,13 @@ Missing grade/city allowance means unknown policy, never an invented zero or
 unlimited allowance. Source policy and allowance version must accompany decisions.
 Only use calculation tools for monetary comparisons and totals. A decision is a
 review-queue entry, never authorization to execute a payment.
+
+Day 5 interpretation notes: per-diem.controls exposes structured gate values.
+Only hotel excess (R-03) and prohibited whole lines (R-07) have explicit deduction
+semantics here. Other violations require review, not invented deductions.
+Meal facts use structured attendee_count, is_client_dinner and alcohol_amount;
+absent facts and ambiguous daily client attendance require manual review.
+Receipt extraction confidence below 0.85 or conflicting receipt fields require
+manual review. This is a demo routing threshold, not calibrated probability.
+DATA-QUALITY query findings describe missing transaction/evidence facts without
+inventing a reimbursement rule. These require manager review.

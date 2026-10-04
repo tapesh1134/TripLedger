@@ -29,6 +29,10 @@ class LineItem(Contract):
     currency: Currency
     description: str
     receipt_file: str | None = None
+    hotel_nights: Annotated[int, Field(strict=True, ge=1, le=365)] | None = None
+    attendee_count: Annotated[int, Field(strict=True, ge=1, le=1000)] | None = None
+    is_client_dinner: bool | None = None
+    alcohol_amount: Amount | None = None
 
 
 class ExpenseReport(Contract):

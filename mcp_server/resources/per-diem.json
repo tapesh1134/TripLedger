@@ -1,5 +1,5 @@
 {
-  "version": "2026-Q2-demo-2",
+  "version": "2026-Q2-demo-3",
   "currency": "EUR",
   "provenance": "Illustrative city/grade values selected for the demo; no full allowance table was provided in the screenshots.",
   "cities": {
@@ -51,5 +51,17 @@
         "client_dinner_per_head": "75.00"
       }
     }
+  },
+  "controls": {
+    "travel_grace_days": 1,
+    "receipt_threshold": "25.00",
+    "receipt_min_confidence": "0.85",
+    "premium_grades": [
+      "Director"
+    ],
+    "premium_hours": "6",
+    "alcohol_percent": "25",
+    "submission_days": 60,
+    "auto_approval_ceiling": "2500.00"
   }
 }

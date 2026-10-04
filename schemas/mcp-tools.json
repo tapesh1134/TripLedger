@@ -138,7 +138,7 @@
     },
     {
       "name": "read_receipt",
-      "description": "Read a synthetic receipt JSON fixture under receipts/. Image extraction is Day 5.",
+      "description": "Read JSON or PNG/JPEG receipt under receipts/. Images use opt-in custom API vision.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {

@@ -66,6 +66,11 @@ class ModelClient:
                     json=body,
                     headers={self.settings.auth_header: auth, "Content-Type": "application/json"},
                 )
+            except httpx.TimeoutException:
+                if attempt == self.settings.retries:
+                    raise ProviderError(
+                        "API request timed out; check HTTP_TIMEOUT_SECONDS (maximum 120)"
+                    ) from None
             except httpx.TransportError:
                 if attempt == self.settings.retries:
                     raise ProviderError(
