@@ -101,7 +101,7 @@ async def get_prompt(name: str, arguments: dict[str, str] | None) -> types.GetPr
         "for candidates and adjudicate against evidence. Use fx_convert and compute_totals for all "
         "money calculations; never calculate monetary values yourself. Cite source record IDs. "
         "If evidence is incomplete, escalate to manager_review. Save only to the review queue. "
-        "Never pay or send messages. Use app.day4 for the bounded model-driven review loop."
+        "Never pay or send messages. Use app.review for the bounded model-driven review loop."
     )
     return types.GetPromptResult(
         description="TripLedger review contract",

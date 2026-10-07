@@ -1,1 +1,1 @@
-"""Pure compute and schema code; MCP transport is a Day 3 deliverable."""
+"""MCP tools, resources, schemas and deterministic calculations."""

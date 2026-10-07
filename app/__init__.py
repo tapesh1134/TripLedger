@@ -1,1 +1,1 @@
-"""Day 1 command-line application."""
+"""TripLedger application entry points and review services."""

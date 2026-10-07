@@ -1,7 +1,7 @@
-"""Day 1 contracts based on assignment sections 7.1 and 7.2.
+"""contracts based on assignment sections 7.1 and 7.2.
 
 Decimal values serialize as strings to preserve money exactly. Both JSON numeric
-values and decimal strings are accepted. Business-policy enforcement is Day 5.
+values and decimal strings are accepted. Business-policy enforcement lives in app.policy_guard.
 """
 
 from datetime import date

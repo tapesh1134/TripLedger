@@ -48,7 +48,7 @@ def generate() -> dict[str, Any]:
             )
         )
         for j in range(30):
-            # First employee aligns with the supplied Day 1 sample. First matching
+            # First employee aligns with the supplied sample. First matching
             # transaction is deliberately on page two (sorted by txn_id).
             amount = f"{10 + j}.00"
             merchant = f"Synthetic Merchant {j:02}"

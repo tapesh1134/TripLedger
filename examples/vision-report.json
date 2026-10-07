@@ -13,7 +13,7 @@
       "amount": "20.00",
       "currency": "EUR",
       "description": "Synthetic business travel",
-      "receipt_file": "receipts/day5/sample-taxi.png"
+      "receipt_file": "receipts/samples/sample-taxi.png"
     }
   ]
 }

@@ -26,6 +26,7 @@ from mcp_server.tool_contracts import (
     TripArgs,
 )
 from mcp_server.tools_compute import compute_totals
+from storage.database import StorageError
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS: dict[str, tuple[type[BaseModel], str]] = {
@@ -57,7 +58,7 @@ CONTRACTS: dict[str, tuple[type[BaseModel], str]] = {
     ),
     "save_decision": (
         Decision,
-        "Store a schema-valid decision in the mock review queue only. Never pays money.",
+        "Store a schema-valid decision in the review queue only. Never pays money.",
     ),
 }
 
@@ -160,6 +161,13 @@ def execute(name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         )
     except BackendError as exc:
         return exc.envelope()
+    except StorageError:
+        return error(
+            "DATABASE_UNAVAILABLE",
+            "PostgreSQL is unavailable.",
+            "Check DATABASE_URL and run database setup.",
+            True,
+        )
     except (OSError, sqlite3.Error):
         return error(
             "LOCAL_STORAGE_ERROR",

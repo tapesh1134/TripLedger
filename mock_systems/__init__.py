@@ -1,1 +1,1 @@
-"""Local-only, synthetic HTTP services for Day 2."""
+"""Local-only, synthetic HTTP services for the application."""

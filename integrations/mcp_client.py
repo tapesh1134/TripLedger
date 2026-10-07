@@ -1,5 +1,6 @@
-"""Small stdio test client. Autonomous model/tool orchestration is still Day 4."""
+"""MCP stdio client shared by review orchestration and diagnostics."""
 
+import os
 import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -15,7 +16,7 @@ async def connect(env: dict[str, str] | None = None) -> AsyncIterator[ClientSess
         command=sys.executable,
         args=["-m", "mcp_server.server"],
         cwd=str(Path(__file__).resolve().parents[1]),
-        env=env,
+        env=dict(os.environ) if env is None else env,
     )
     async with stdio_client(parameters) as (reader, writer):
         async with ClientSession(reader, writer) as session:

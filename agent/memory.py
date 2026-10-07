@@ -1,4 +1,4 @@
-"""Keep a bounded full history for Day 4; do not silently drop evidence."""
+"""Keep a bounded full history during review; do not silently drop evidence."""
 
 import json
 from typing import Any

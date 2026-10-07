@@ -66,6 +66,14 @@ class JobStore:
             raise FileNotFoundError
         return path
 
+    def artifact(self, job_id: str, name: str) -> bytes:
+        if name not in {"result.json", "trace.json"}:
+            raise FileNotFoundError
+        return (self.directory(job_id) / name).read_bytes()
+
+    def close(self) -> None:
+        pass
+
     def get(self, job_id: str) -> dict[str, Any]:
         value: dict[str, Any] = json.loads(
             (self.directory(job_id) / "job.json").read_text(encoding="utf-8")

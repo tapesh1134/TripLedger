@@ -17,7 +17,7 @@ def compute_totals(
 ) -> dict[str, Any]:
     """Return exact two-decimal strings and line-level evidence.
 
-    All inputs must already be in base_currency (FX belongs to Day 2).
+    All inputs must already be in base_currency (use fx_convert before calculation).
     R-03 style: disallow only amount exceeding limit * quantity.
     R-07 style: disallow the entire line. Overlapping caps never double-count.
     This is a generic calculator, not a policy evaluator or approval engine.

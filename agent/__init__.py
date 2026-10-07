@@ -1,1 +1,1 @@
-"""Day 4 bounded model-driven review orchestration."""
+"""Bounded model-driven review orchestration."""

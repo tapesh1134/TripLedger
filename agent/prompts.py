@@ -42,7 +42,7 @@ Failed/blocked calls are diagnostics, never supporting receipt evidence. Never g
 receipt path: read only receipt_file paths explicitly attached to report lines.
 If an attached receipt fails extraction, set missing_receipt and manager_review,
 with a query citing the report line. Do not keep retrying unreadable images.
-Day 5 verifies caps independently: only R-03 hotel excess and R-07 prohibited
+The host verifies caps independently: only R-03 hotel excess and R-07 prohibited
 whole-line deductions are currently unambiguously defined by this demo policy.
 Other policy violations require findings/review; do not invent deductions.
 Receipt availability and card matching are separate checks. If a transaction matches

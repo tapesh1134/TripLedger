@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def validate():
     labels = json.loads((ROOT / "evals/labels.json").read_text())
-    data = json.loads((ROOT / "mock_systems/seed/day4-data.json").read_text())
+    data = json.loads((ROOT / "mock_systems/seed/evaluation-data.json").read_text())
     assert len(labels) == 25
     assert {r for case in labels for r in case["expected_rules"]} == {
         f"R-{n:02}" for n in range(1, 11)

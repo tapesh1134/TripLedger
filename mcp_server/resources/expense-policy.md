@@ -24,14 +24,14 @@ Auto-approval also requires no blocking findings, no queries, confidence at leas
 manager_review: FR-18 is the stricter gate at the boundary. Any suspected duplicate,
 prohibited category or missing required receipt forces at least manager_review.
 The supplied document does not fully define audit_hold selection; do not invent
-that rule. Day 3 exposes policy data; the final decision gates arrive later.
+that rule. The final verifier applies the supported decision gates.
 
 Missing grade/city allowance means unknown policy, never an invented zero or
 unlimited allowance. Source policy and allowance version must accompany decisions.
 Only use calculation tools for monetary comparisons and totals. A decision is a
 review-queue entry, never authorization to execute a payment.
 
-Day 5 interpretation notes: per-diem.controls exposes structured gate values.
+interpretation notes: per-diem.controls exposes structured gate values.
 Only hotel excess (R-03) and prohibited whole lines (R-07) have explicit deduction
 semantics here. Other violations require review, not invented deductions.
 Meal facts use structured attendee_count, is_client_dinner and alcohol_amount;

@@ -11,6 +11,8 @@ from urllib.parse import urlsplit
 from pydantic import ValidationError
 
 from app.review_jobs import BusyError, JobStore
+from storage.database import StorageError
+from storage.jobs import PostgresJobStore
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_BODY = 1024 * 1024
@@ -22,7 +24,7 @@ EXAMPLES = {
 }
 
 
-def make_handler(store: JobStore, token: str) -> type[BaseHTTPRequestHandler]:
+def make_handler(store: JobStore | PostgresJobStore, token: str) -> type[BaseHTTPRequestHandler]:
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, format: str, *args: Any) -> None:
             pass  # No request bodies, tokens or URLs in HTTP logs.
@@ -54,7 +56,7 @@ def make_handler(store: JobStore, token: str) -> type[BaseHTTPRequestHandler]:
                 self.send(403, {"error": "Cross-origin request rejected."})
                 return False
             if api and not hmac.compare_digest(self.headers.get("X-Session-Token", ""), token):
-                self.send(403, {"error": "Open the complete URL printed by app.day7."})
+                self.send(403, {"error": "Open the complete URL printed by app.dashboard."})
                 return False
             return True
 
@@ -83,11 +85,16 @@ def make_handler(store: JobStore, token: str) -> type[BaseHTTPRequestHandler]:
                     if len(parts) == 1:
                         self.send(200, store.get(parts[0]))
                     elif len(parts) == 2 and parts[1] in {"result.json", "trace.json"}:
-                        self.send(200, (store.directory(parts[0]) / parts[1]).read_bytes())
+                        self.send(200, store.artifact(parts[0], parts[1]))
                     else:
                         raise FileNotFoundError
                 else:
                     raise FileNotFoundError
+            except StorageError:
+                self.send(
+                    503,
+                    {"error": "Database unavailable. Check the database and restart if needed."},
+                )
             except FileNotFoundError:
                 self.send(404, {"error": "Not found or artifact not saved yet."})
             except (OSError, ValueError):
@@ -110,6 +117,8 @@ def make_handler(store: JobStore, token: str) -> type[BaseHTTPRequestHandler]:
                 self.connection.settimeout(10)
                 raw = json.loads(self.rfile.read(length), parse_float=Decimal)
                 self.send(202, store.submit(raw))
+            except StorageError:
+                self.send(503, {"error": "Database unavailable. Review was not started."})
             except BusyError as error:
                 self.send(409, {"error": str(error)})
             except ValidationError as error:
@@ -126,5 +135,5 @@ def make_handler(store: JobStore, token: str) -> type[BaseHTTPRequestHandler]:
     return Handler
 
 
-def create_server(store: JobStore, token: str, port: int) -> ThreadingHTTPServer:
+def create_server(store: JobStore | PostgresJobStore, token: str, port: int) -> ThreadingHTTPServer:
     return ThreadingHTTPServer(("127.0.0.1", port), make_handler(store, token))

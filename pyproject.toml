@@ -3,20 +3,23 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tripledger-day7"
-version = "0.7.0"
-description = "TripLedger Days 1-7: local expense review dashboard"
+name = "tripledger"
+version = "0.9.0"
+description = "TripLedger: PostgreSQL expense review with pgvector policy retrieval"
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2.10,<3", "httpx[socks]>=0.27,<1", "python-dotenv>=1,<2", "mcp>=1.30,<2", "jsonschema>=4.20,<5", "Pillow>=11,<13"]
+dependencies = ["pydantic>=2.10,<3", "httpx[socks]>=0.27,<1", "python-dotenv>=1,<2", "mcp>=1.30,<2", "jsonschema>=4.20,<5", "Pillow>=11,<13", "psycopg[binary]>=3.2,<4"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9", "ruff>=0.9,<1", "mypy>=1.14,<2", "types-jsonschema"]
 
 [project.scripts]
-tripledger = "app.cli:main"
+tripledger = "app.dashboard:main"
+tripledger-review = "app.review:main"
+tripledger-db = "app.database:main"
+tripledger-evaluate = "app.evaluate:main"
 
 [tool.setuptools.packages.find]
-include = ["app*", "integrations*", "mcp_server*", "agent*", "mock_systems*", "evals*"]
+include = ["app*", "integrations*", "mcp_server*", "agent*", "mock_systems*", "evals*", "storage*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -32,7 +35,7 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["app", "integrations", "mcp_server", "agent", "evals/scoring.py", "evals/run_eval.py"]
+files = ["storage", "app", "integrations", "mcp_server", "agent", "evals/scoring.py", "evals/run_eval.py"]
 
 # MCP v1 low-level registration decorators lack complete typing annotations.
 # Restrict this exception to decorator boundaries, not the tool implementation.
@@ -42,3 +45,4 @@ disable_error_code = ["untyped-decorator", "no-untyped-call"]
 
 [tool.setuptools.package-data]
 app = ["static/*.html", "static/*.css", "static/*.js"]
+storage = ["schema.sql"]

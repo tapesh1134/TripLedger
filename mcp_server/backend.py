@@ -1,4 +1,4 @@
-"""HTTP adapters owned by the future MCP server; model credentials are never used."""
+"""SQL evidence with an optional legacy HTTP backend; no model credentials."""
 
 import json
 import logging
@@ -87,6 +87,12 @@ class HttpAdapter:
 class Backend:
     def __init__(self, urls: dict[str, str] | None = None, adapter: HttpAdapter | None = None):
         load_dotenv()
+        from storage.business import BusinessStore
+        from storage.database import database_url
+
+        self.store = (
+            BusinessStore() if database_url() and urls is None and adapter is None else None
+        )
         self.urls = urls or {
             role: os.getenv(f"{role.upper()}_BASE_URL", f"http://127.0.0.1:{port}")
             for role, port in [("card", 8011), ("travel", 8012), ("hr", 8013), ("ledger", 8014)]
@@ -100,14 +106,20 @@ class Backend:
         return self.http.request("GET", self.urls[role].rstrip("/") + path, params=params)
 
     def get_employee(self, employee_id: str) -> Any:
+        if self.store is not None:
+            return self.store.get_employee(employee_id)
         return self.get("hr", "/employees/" + quote(employee_id, safe=""))
 
     def get_trip(self, trip_id: str) -> Any:
+        if self.store is not None:
+            return self.store.get_trip(trip_id)
         return self.get("travel", "/trips/" + quote(trip_id, safe=""))
 
     def list_card_transactions(
         self, employee_id: str, start: str, end: str, cursor: str | None = None
     ) -> dict[str, Any]:
+        if self.store is not None:
+            return self.store.list_card_transactions(employee_id, start, end, cursor)
         params = {"employee_id": employee_id, "from": start, "to": end}
         if cursor is not None:
             params["cursor"] = cursor
@@ -136,9 +148,13 @@ class Backend:
         raise BackendError("PAGINATION_BUDGET_EXHAUSTED")
 
     def list_settled_lines(self, employee_id: str, months: int = 12) -> Any:
+        if self.store is not None:
+            return self.store.list_settled_lines(employee_id, months)
         return self.get("ledger", "/settled-lines", {"employee_id": employee_id, "months": months})
 
     def save_decision(self, decision: dict[str, Any]) -> Any:
+        if self.store is not None:
+            return self.store.save_decision(decision)
         return self.http.request(
             "POST", self.urls["ledger"].rstrip("/") + "/review-queue", json=decision
         )

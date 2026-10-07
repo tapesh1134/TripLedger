@@ -21,7 +21,7 @@ def read_json(path: str) -> Any:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="TripLedger Day 1 foundation")
+    parser = argparse.ArgumentParser(description="TripLedger foundation")
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("validate-report", "validate-decision", "compute"):
         command = commands.add_parser(name)
