@@ -1,0 +1,450 @@
+{
+  "info": {
+    "name": "TripLedger Platform",
+    "description": "Use a dedicated development environment. Set credentials locally; do not share exported secrets. Create manager/employee as admin, then sign in with each role for their workflow. After uploading a receipt, PUT the draft with receiptId before submitting. See docs/API.md.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8080/api"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "initialPassword",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "managerId",
+      "value": ""
+    },
+    {
+      "key": "employeeId",
+      "value": ""
+    },
+    {
+      "key": "policyId",
+      "value": ""
+    },
+    {
+      "key": "reportId",
+      "value": ""
+    },
+    {
+      "key": "rowVersion",
+      "value": "0"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign in (set email/password variables)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.collectionVariables.set(\"token\", data.token); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Sign out",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin \u2014 people",
+      "item": [
+        {
+          "name": "List people",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Create manager",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@example.com\",\n  \"name\": \"Manager\",\n  \"password\": \"{{initialPassword}}\",\n  \"role\": \"MANAGER\",\n  \"managerId\": null,\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.collectionVariables.set(\"managerId\", data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"employee@example.com\",\n  \"name\": \"Employee\",\n  \"password\": \"{{initialPassword}}\",\n  \"role\": \"EMPLOYEE\",\n  \"managerId\": \"{{managerId}}\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.collectionVariables.set(\"employeeId\", data.id); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin \u2014 policies",
+      "item": [
+        {
+          "name": "Create policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/policies",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Travel policy demo\",\n  \"content\": \"Hotel cap EUR 100 per night; receipts required.\",\n  \"rules\": [\n    {\n      \"category\": \"hotel\",\n      \"currency\": \"EUR\",\n      \"limit\": \"100\",\n      \"basis\": \"PER_NIGHT\",\n      \"receiptRequired\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.collectionVariables.set(\"policyId\", data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Index and publish (real embedding calls)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/policies/{{policyId}}/publish",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List policies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/policies"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports \u2014 sign in with the appropriate role first",
+      "item": [
+        {
+          "name": "List accessible reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports"
+          }
+        },
+        {
+          "name": "Employee \u2014 create draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Paris business trip\",\n  \"purpose\": \"Planning meeting\",\n  \"destination\": \"Paris\",\n  \"startDate\": \"2026-10-01\",\n  \"endDate\": \"2026-10-04\",\n  \"baseCurrency\": \"EUR\",\n  \"rowVersion\": 0,\n  \"lines\": [\n    {\n      \"lineId\": \"L1\",\n      \"date\": \"2026-10-02\",\n      \"category\": \"hotel\",\n      \"merchant\": \"Example Hotel\",\n      \"amount\": \"360.00\",\n      \"currency\": \"EUR\",\n      \"description\": \"Three night stay\",\n      \"receiptId\": null,\n      \"hotelNights\": 3,\n      \"attendeeCount\": null,\n      \"clientDinner\": null,\n      \"alcoholAmount\": null\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.collectionVariables.set(\"reportId\", data.id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Employee \u2014 upload receipt (choose file)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/reports/{{reportId}}/receipts",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get report and current row version",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.collectionVariables.set(\"rowVersion\", data.row_version); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Employee \u2014 submit (real AI calls)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}/submit",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": \"{{rowVersion}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Manager \u2014 request clarification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}/decision",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": \"{{rowVersion}}\",\n  \"action\": \"CLARIFY\",\n  \"reason\": \"Please provide an itemized receipt.\",\n  \"approvedAmount\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Manager \u2014 approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}/decision",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": \"{{rowVersion}}\",\n  \"action\": \"APPROVE\",\n  \"reason\": \"Evidence verified manually. Hotel cap applied.\",\n  \"approvedAmount\": \"300.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

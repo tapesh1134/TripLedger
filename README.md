@@ -1,243 +1,234 @@
-# TripLedger — Day 1 only
+# TripLedger Platform
 
-A runnable Python foundation for the travel-expense compliance project in your screenshots.
-Python 3.11 or 3.12 is recommended for this delivery; verification used Python 3.12.
+A single-organization expense workspace: React frontend, four Java Spring Boot
+applications (gateway, identity, expense, policy), and a Python AI service with a
+separate background worker. Employees submit reports; assigned managers make
+final decisions; administrators manage access and publish policy versions.
 
-## What is complete
+## Included
 
-- Repository scaffold following section 13, `.env.example`, and `.gitignore`.
-- Custom chat API client with token-usage logging and a live smoke-test command.
-- Optional, separately configured custom embedding client and smoke-test command.
-- Pydantic report and decision contracts, plus exported JSON schemas.
-- Pure `compute_totals` with exact Decimal arithmetic, line-level details and unit tests.
-- Ruff linter, mypy type checker and pytest commands.
+- Employee forms, saved drafts, private PNG/JPEG receipt uploads, and report history.
+- Manager inbox, evidence and AI findings, clarification, approval and rejection.
+- Admin accounts, roles, manager assignments, immutable policy versions and publication.
+- Opaque bearer sessions, BCrypt passwords, server-side report authorization,
+  password changes, session revocation, and per-gateway sign-in throttling.
+- PostgreSQL per service, Flyway Java migrations, pgvector policy retrieval.
+- Durable submission outbox, RabbitMQ publisher confirms, idempotent AI callbacks.
+- Python tool calling, optional vision extraction, exact decimal cap calculations,
+  date checks, receipt mismatches, duplicate receipt hashes, date-based FX caching.
+- Custom chat/embedding endpoints, keys, model names, auth headers and CA bundles.
+- Architecture, API, workflow and deployment guides in `docs/`.
 
-This is the **Day 1 foundation**, not the finished compliance agent. It does not
-review reports autonomously, fetch transactions, run an MCP server, extract receipts,
-apply all ten policy rules, approve expenses, or send payments/messages.
-Files for later days are explicitly marked as reserved. No database is needed.
+The project is a working development baseline, not a claim of production certification.
+It requires your database, RabbitMQ and model configuration. There are no embedded
+provider keys, public demo accounts, fake successful reviews, or payment operations.
 
-The assignment's early summary says seven tools, but section 11 and Day 3 specify
-nine. Follow the later nine-tool contract when implementing Day 3.
+## Requirements
 
-## Windows PowerShell setup
+- JDK 17 or 21; Maven 3.9+ (`java -version`, `mvn -version`).
+- Python 3.11 or 3.12 recommended.
+- Node.js 20.19+ or 22.12+ and npm.
+- PostgreSQL 17 with pgvector, plus RabbitMQ. Each may run locally or as optional
+  infrastructure containers. Java, Python and React run on your computer.
 
-Extract the ZIP and open a terminal inside `tripledger-day1`:
+`pgAdmin` manages PostgreSQL; it is not the database server. Configure the actual
+PostgreSQL server port. A local PostgreSQL installation commonly uses 5432; this
+project's optional container publishes 5433 to avoid that collision.
 
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-Copy-Item .env.example .env
-```
+## Windows quick start
 
-If you have Python 3.11 instead, use `py -3.11`. These commands do not require
-activating the environment or changing PowerShell execution policy.
-Dependencies use version ranges; `requirements-lock.txt` records the environment
-tested for this delivery. Use `pip install -r requirements-lock.txt` to reproduce it.
+Run from the extracted `tripledger-platform` folder. Do not reuse the old project's
+virtual environment or point these new services at its database tables.
 
-Linux/macOS equivalent:
-
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements-dev.txt
-cp .env.example .env
-```
-
-Use `.venv/bin/python` instead of `.\.venv\Scripts\python.exe` in the commands below.
-Run all commands from the extracted project root.
-
-## 1. Run the Day 1 acceptance checks — no API key needed
+### 1. Create configuration and install dependencies
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_compute.py -q
+py -3.12 -m venv ai-service/.venv
+.\ai-service\.venv\Scripts\python.exe -m pip install -r ai-service/requirements.txt
+.\ai-service\.venv\Scripts\python.exe scripts/configure.py
+npm ci --prefix frontend
+mvn clean verify
+npm run build --prefix frontend
+```
+
+Use `py -3.11` if Python 3.12 is not installed. `configure.py` creates `.env` with
+random local secrets and refuses to overwrite an existing file. Open `.env` and
+set your company chat and embedding endpoints, API keys and model names. The
+administrator email/password are `BOOTSTRAP_ADMIN_EMAIL` and
+`BOOTSTRAP_ADMIN_PASSWORD`; they are applied only to an empty identity database.
+
+The Python PostgreSQL driver is **pg8000**, which does not require psycopg/libpq DLLs.
+The Java services use the PostgreSQL JDBC driver.
+
+### 2. Choose infrastructure
+
+**Option A: optional Docker PostgreSQL + RabbitMQ**
+
+```powershell
+docker compose up -d --wait postgres rabbitmq
+```
+
+Keep the JDBC URLs and AI URL using `127.0.0.1:5433`. Application services are not
+containerized. Existing named volume passwords do not change just because `.env`
+changes; use the existing password or change it through PostgreSQL administration.
+Do not delete volumes to fix an authentication issue.
+
+**Option B: local PostgreSQL + RabbitMQ**
+
+Install pgvector for your PostgreSQL server. Edit these `.env` entries:
+
+```dotenv
+DB_USER=your_postgres_user
+DB_PASSWORD=your_postgres_password
+IDENTITY_JDBC_URL=jdbc:postgresql://127.0.0.1:5432/tripledger_identity
+EXPENSE_JDBC_URL=jdbc:postgresql://127.0.0.1:5432/tripledger_expense
+POLICY_JDBC_URL=jdbc:postgresql://127.0.0.1:5432/tripledger_policy
+AI_DATABASE_URL=postgresql://your_postgres_user:URL_ENCODED_PASSWORD@127.0.0.1:5432/tripledger_ai
+```
+
+URI-encode special characters only in the AI connection URL password. For example,
+`@` becomes `%40`. `DB_PASSWORD` holds the original password. Set RabbitMQ credentials
+to match your local broker. Alternatively run only the broker in Docker:
+
+```powershell
+docker compose up -d --wait rabbitmq
+```
+
+No Docker is required when both PostgreSQL and RabbitMQ are installed locally.
+Never use `host.docker.internal` or `postgres` as the database hostname for these
+locally running application processes.
+
+### 3. Create databases and initialize AI storage
+
+```powershell
+.\ai-service\.venv\Scripts\python.exe scripts/create_databases.py
+Push-Location ai-service
+.\.venv\Scripts\python.exe -m app.database
+Pop-Location
+```
+
+The database user needs permission to create databases and install the vector
+extension. If it does not, have a DBA run `infra/create-databases.sql` and install
+`vector` in `tripledger_ai`. The Java services apply their own migrations on startup.
+The helper creates the four standard database names; if you use different names,
+create them manually and update all corresponding URLs.
+
+### 4. Start applications locally
+
+```powershell
+.\scripts\start-local.ps1
+```
+
+This opens seven terminal windows. Keep them open. If script execution is blocked
+by your workstation policy, run the commands below in separate terminals instead;
+there is no need to change the machine's execution policy.
+
+```powershell
+.\ai-service\.venv\Scripts\python.exe scripts/run.py identity
+.\ai-service\.venv\Scripts\python.exe scripts/run.py expense
+.\ai-service\.venv\Scripts\python.exe scripts/run.py policy
+.\ai-service\.venv\Scripts\python.exe scripts/run.py gateway
+.\ai-service\.venv\Scripts\python.exe scripts/run.py ai-api
+.\ai-service\.venv\Scripts\python.exe scripts/run.py ai-worker
+.\ai-service\.venv\Scripts\python.exe scripts/run.py frontend
+```
+
+The launcher loads the root `.env`; plain `java -jar` does not automatically load
+it. In IntelliJ, supply the same environment variables to each service run configuration.
+Start the Python API as well as the worker: the API indexes policies; the worker
+consumes queued reports. Close terminals with Ctrl+C to stop services.
+
+Open **http://127.0.0.1:5173**.
+
+### 5. First usable workflow
+
+1. Sign in using the bootstrap administrator credentials in `.env`.
+2. In **People & access**, create a manager, then an employee assigned to that manager.
+   Give each a different initial password of at least 12 characters. They can change
+   their own password in **My account**.
+3. In **Expense policies**, create a policy. Paste `examples/travel-policy.md` and
+   enter its three matching structured limits. Click **Save policy draft**, then
+   **Index & publish version**. This makes real embedding API calls.
+4. Sign out. Sign in as the employee, create a report and save the draft.
+5. Upload PNG/JPEG receipts to expense lines; save again or submit. Uploads are real
+   private files stored in the Expense Service database, not browser file paths.
+6. Submit. The report is frozen as a revision and queued for AI review. This makes
+   real chat calls, embedding search calls, and optional vision calls. Cross-currency
+   claims call the configured FX service.
+7. Sign in as the assigned manager. Read the report, receipt downloads, AI findings,
+   policy citations and calculations. Approve, reject, or request clarification.
+8. For clarification, the employee edits the returned report and resubmits. The old
+   snapshot/review remains available. Approval records an amount but does not pay it.
+
+If AI fails, the manager can review manually or the manager/admin can retry. A
+provider error is never converted into an automatic approval.
+
+## Ports
+
+| Component | Port |
+|---|---:|
+| React (development) | 5173 |
+| API Gateway | 8080 |
+| Identity Service | 8081 |
+| Expense Service | 8082 |
+| Policy Service | 8083 |
+| Python indexing API | 8090 |
+| Python worker | no HTTP port |
+| Optional PostgreSQL container | 5433 |
+| RabbitMQ / management | 5672 / 15672 |
+
+If the original TripLedger dashboard is using 8090, stop it before starting this
+project. Only the frontend/gateway should be exposed when deploying for other people.
+
+## Provider settings
+
+Use either `LLM_BASE_URL=https://provider.example/v1` or a full
+`LLM_ENDPOINT_URL=https://provider.example/v1/chat/completions`. A nonempty endpoint
+is the complete URL and takes precedence; do not set it to a relative path.
+Configure embeddings the same way. Leave `LLM_TEMPERATURE` empty for models that do
+not accept it. The chat API must support OpenAI-style tool calls. Embedding input
+field, list/scalar input, vector response path, and optional dimensions are configurable.
+Use `CA_BUNDLE` for a corporate PEM trust bundle; TLS verification remains enabled.
+Provider settings never go to React. `RECEIPT_VISION_ENABLED=false` marks receipts
+unverified; set it to true only with a compatible vision model/gateway.
+
+## Checks
+
+```powershell
+mvn verify
+npm run build --prefix frontend
+Push-Location ai-service
 .\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe -m ruff check .
-.\.venv\Scripts\python.exe -m mypy
+Pop-Location
 ```
 
-The first command is the assignment's explicit Day 1 done-when gate. The complete
-suite also checks schema validation and model request/response handling offline.
-Mock transport tests do not contact or prove access to your real API.
+A Postman collection is included at `examples/TripLedger.postman_collection.json`.
+Set credentials as local collection variables; do not export or share real passwords.
 
-## 2. Understand the calculator
+See `docs/VALIDATION.md` for what was verified in the authoring environment and
+what requires your infrastructure. Generated environments, test outputs, node_modules,
+compiled JARs and credentials are excluded from this source archive.
 
-```powershell
-.\.venv\Scripts\python.exe -m app.cli compute examples/compute-request.json
-```
+## Scope and limits
 
-The illustrative hotel costs EUR 412 for 3 nights. The supplied cap is EUR 120
-per night: the tool permits EUR 360 and disallows only EUR 52. With the example
-taxi and meal, totals are **EUR 494.40 reimbursable** and **EUR 52.00 disallowed**.
-This allowance is illustrative: the screenshots do not supply the per-city table.
+- One organization, one primary role per account. Managers can also submit their own
+  reports, but a different manager must be assigned to approve them.
+- No corporate card, HR, travel-booking, payroll, email or payment integration is
+  connected. External reconciliation is explicitly flagged for manual review.
+- This is a replatformed workflow, not a claim that every legacy EVAL rule has been
+  ported. Structured category/currency caps and receipt/date/hash checks are automated;
+  other policy text is evidence for AI explanation and manager interpretation.
+- Receipts are PNG/JPEG only, max 8 MB each, 100 uploads per report. Reports allow up
+  to 50 lines. Policy input is text/Markdown, max 100 KB, with up to 100 structured rules.
+- Receipt bytes are stored in PostgreSQL for a self-contained local deployment. An
+  object-storage adapter is a future replacement when file volume grows.
+- Current report list is the most recent 500 accessible reports. Direct report IDs
+  and their audit/revision history remain retrievable.
+- FX conversion requires a supported currency pair. An unavailable rate fails the AI
+  review rather than inventing a conversion. Managers must verify any manual conversion.
+- Policy vector search uses exact cosine search scoped to a version. It does not
+  assume a fixed embedding dimension or configure a dimension-specific HNSW index.
+- Broker processing is at-least-once, not exactly-once. Results/callbacks are idempotent;
+  a crash during a provider request can incur another provider call on redelivery.
 
-```powershell
-.\.venv\Scripts\python.exe -m app.cli compute examples/whole-line-request.json
-```
-
-Here `whole_line` disallows all EUR 75.50. Cap values are passed into the tool;
-they are never embedded as policy constants in the calculator.
-
-Input contract:
-
-```json
-{
-  "base_currency": "EUR",
-  "lines": [{"line_id": "L1", "amount": "412.00", "currency": "EUR"}],
-  "caps": [{"line_id": "L1", "rule_id": "R-03", "kind": "cap_excess",
-            "limit": "120.00", "quantity": 3}]
-}
-```
-
-- `limit` means allowance **per unit**; `quantity` is nights/people/etc. supplied by
-  the caller. Quantity defaults to 1. Extracting these facts is later work.
-- `whole_line` takes no limit or quantity.
-- Each original line and its effective cap are rounded to two decimals using
-  `ROUND_HALF_UP` before aggregation. Decimal precision is 40 inside computation.
-- Overlapping rules use the strictest allowed amount; disallowed amounts are not
-  added twice. Per-rule excesses are explanatory and must not be summed together.
-- Mixed currencies are rejected; Day 2 FX must convert them first.
-- Negative/refund lines are deliberately rejected in this Day 1 contract.
-- Two-decimal money is a documented simplification for the assignment's EUR demo;
-  zero/three-minor-unit currencies need a later explicit currency precision policy.
-- Outputs are decimal strings to preserve exact values in JSON. Inputs accept
-  numbers or decimal strings; CLI JSON numbers are parsed directly as Decimal.
-
-## 3. Validate the schemas
-
-```powershell
-.\.venv\Scripts\python.exe -m app.cli validate-report examples/report.json
-.\.venv\Scripts\python.exe -m app.cli validate-decision examples/decision.json
-.\.venv\Scripts\python.exe -m app.cli export-schemas
-```
-
-`mcp_server/schemas.py` is the source of truth. Exported contracts live in
-`schemas/`. Unknown fields, negative money, invalid dates, duplicate report line
-IDs, invalid decision enums, and findings without evidence are rejected.
-
-Decision validation here checks structure, not the Day 5 policy gates or whether
-evidence references really exist. The example decision is an illustrative fixture,
-not an output generated by an agent. Receipt paths are illustrative and no image
-files are supplied. `duplicate_candidates` has an explicitly chosen inner shape
-because the screenshot shows only an empty array.
-
-## 4. Configure YOUR custom LLM API
-
-Edit `.env` locally. Never paste your key into source code or commit `.env`.
-
-```dotenv
-LLM_BASE_URL=https://your-company-host.example/v1
-LLM_API_KEY=your-key
-LLM_MODEL=your-model-name
-```
-
-The client appends `/chat/completions` to the base URL **exactly once**. Include
-your provider's required version prefix yourself. If your URL is already the full
-endpoint, or uses a custom route/query string, configure this instead:
-
-```dotenv
-LLM_ENDPOINT_URL=https://your-company-host.example/custom/chat/completions
-```
-
-`LLM_ENDPOINT_URL` overrides the base URL. The client does not guess `/v1` or
-rewrite deployment URLs. Authentication defaults to `Authorization: Bearer KEY`.
-For a provider requiring `api-key: KEY`, set:
-
-```dotenv
-LLM_AUTH_HEADER=api-key
-LLM_AUTH_SCHEME=
-```
-
-If your model rejects temperature, leave `LLM_TEMPERATURE=` blank. Optional
-provider body fields can be set with `LLM_EXTRA_BODY_JSON`, for example
-`{"max_completion_tokens":64}`. Core fields cannot be overridden through it.
-
-Run the real connection check:
-
-```powershell
-.\.venv\Scripts\python.exe -m app.cli llm-smoke
-```
-
-It sends only a fixed synthetic greeting, verifies a chat response, prints `ok`
-and token counts, and appends a metadata-only event to `traces/usage.jsonl`.
-If the provider omits token usage, counts are `null`; they are not fabricated.
-A successful live response with usage completes the remaining connection gate.
-The live call could not be performed during delivery because your URL/key/model
-were not supplied.
-
-**Compatibility assumption:** the chat API accepts an OpenAI-compatible
-`model/messages` request and returns `choices[0].message`. A custom URL alone
-does not imply that format. If your API differs, adapt
-`integrations/model_client.py` using its documented request/response sample.
-No OpenAI SDK or direct OpenAI service is required.
-
-## 5. Optional custom embedding API
-
-Embeddings are not required for Day 1 or exact arithmetic. This project does not
-create a vector database or embed reports automatically. Chat works without any
-embedding configuration.
-
-```dotenv
-EMBEDDING_BASE_URL=https://your-company-host.example/v1
-EMBEDDING_API_KEY=your-embedding-key
-EMBEDDING_MODEL=your-embedding-model
-EMBEDDING_DIMENSIONS=
-```
-
-The default endpoint is `BASE_URL/embeddings`; `EMBEDDING_ENDPOINT_URL` overrides it.
-Leave dimensions blank unless your provider explicitly supports that parameter.
-For the standard format, the request uses `input: [text]` and the response vector
-is read from `data[0].embedding`.
-
-For a custom endpoint accepting a scalar `inputText` and returning `embedding`:
-
-```dotenv
-EMBEDDING_INPUT_FIELD=inputText
-EMBEDDING_INPUT_AS_LIST=false
-EMBEDDING_VECTOR_PATH=embedding
-```
-
-The request still includes `model`; if your endpoint disallows that or needs more
-complex signing/format changes, adapt the provider file. Authentication header,
-scheme and extra request fields have separate `EMBEDDING_...` settings.
-
-```powershell
-.\.venv\Scripts\python.exe -m app.cli embedding-smoke
-```
-
-This checks a real vector and prints its dimensions without printing the vector.
-Embedding failure does not prevent running any Day 1 calculation or schema check.
-
-## Troubleshooting
-
-| Symptom | What to check |
-|---|---|
-| 400 | Request format, model, extra fields; try blank temperature/dimensions |
-| 401 | Key and authentication header/scheme |
-| 403 | Gateway/model permission; retries cannot fix an access denial |
-| 404 | Full endpoint path, version prefix, deployment/model name |
-| 429 / 5xx | Three retries with exponential backoff and jitter, then a clear error |
-| Network / TLS error | Corporate VPN/proxy and `CA_BUNDLE`; TLS verification is enabled |
-| Unexpected response shape | Adapt `integrations/model_client.py` to provider documentation |
-
-Logs contain request IDs, timestamps, latency and numeric token usage only. Keys,
-URLs, prompt contents and provider error bodies are not logged. Day 1 does not
-implement the full intake redaction pipeline: use only synthetic fixtures, and
-the supplied smoke commands send no report contents.
-
-## How the files connect
-
-1. `app/cli.py` reads a command and validates its input.
-2. `mcp_server/schemas.py` defines the report, decision and calculation contracts.
-3. `mcp_server/tools_compute.py` performs deterministic money calculations.
-4. `app/config.py` loads separate custom endpoint settings from `.env`.
-5. `integrations/model_client.py` performs chat or embedding API requests.
-6. `tests/` demonstrates the acceptance behavior without internet access.
-
-Day 2 adds mock systems and dated FX. Day 3 exposes tools/resources via MCP.
-Day 4 introduces the actual agent. Those stages are intentionally left for later.
-
-Implementation references: [Pydantic models](https://docs.pydantic.dev/latest/concepts/models/)
-and [HTTPX mock transports](https://www.python-httpx.org/advanced/transports/#mock-transports).
-#   T r i p L e d g e r  
- 
+See `docs/DEPLOYMENT.md` before making this development workspace available to a team.
